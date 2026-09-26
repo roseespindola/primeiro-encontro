@@ -3,6 +3,14 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8"/>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QN8TYQYL79"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-QN8TYQYL79');
+</script>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Atendimento terapêutico online para mulheres | Rosemary Espíndola Rocha</title>
 <meta content="Atendimento terapêutico online para mulheres que vivem sobrecarga emocional, autocobrança e dificuldade de se priorizar. Conheça o Primeiro Encontro Individual com Rosemary Espíndola Rocha." name="description"/>
@@ -293,5 +301,76 @@ details p{margin:12px 0 0;font-size:.94rem}
 </div>
 </div>
 </footer>
+
+<!-- Eventos personalizados GA4 - funil Primeiro Encontro -->
+<script>
+(function(){
+  function gtagSafe(){
+    if (typeof gtag === 'function') {
+      gtag.apply(null, arguments);
+    }
+  }
+
+  // ---------- Evento: visualizou_valor ----------
+  // Observa especificamente o elemento que contém "Investimento: R$ 147"
+  // (não a Hero inteira), localizado por texto para não depender de alterar o HTML.
+  var precoEl = null;
+  var trustSpans = document.querySelectorAll('.trust span');
+  for (var i = 0; i < trustSpans.length; i++) {
+    if (trustSpans[i].textContent.indexOf('R$ 147') !== -1) {
+      precoEl = trustSpans[i];
+      break;
+    }
+  }
+
+  // ---------- Evento: visualizou_primeiro_encontro ----------
+  var encontroEl = document.getElementById('encontro');
+
+  // ---------- Evento: visualizou_duvidas ----------
+  var duvidasEl = document.getElementById('duvidas');
+
+  function observarUnaVez(el, nomeEvento){
+    if (!el) return;
+    if (!('IntersectionObserver' in window)) {
+      // fallback simples caso o navegador não suporte IntersectionObserver
+      gtagSafe('event', nomeEvento);
+      return;
+    }
+    var disparado = false;
+    var observer = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting && !disparado) {
+          disparado = true;
+          gtagSafe('event', nomeEvento);
+          observer.disconnect();
+        }
+      });
+    }, { threshold: 0.5 });
+    observer.observe(el);
+  }
+
+  observarUnaVez(precoEl, 'visualizou_valor');
+  observarUnaVez(encontroEl, 'visualizou_primeiro_encontro');
+  observarUnaVez(duvidasEl, 'visualizou_duvidas');
+
+  // ---------- Evento: clique_checkout ----------
+  // Captura cliques em TODOS os links que levam ao checkout da Kiwify,
+  // identificando de qual bloco da página o clique partiu.
+  var linksCheckout = document.querySelectorAll('a[href*="pay.kiwify.com.br"]');
+  linksCheckout.forEach(function(link){
+    var localBotao = 'outro';
+    if (link.closest('.header')) {
+      localBotao = 'header';
+    } else if (link.closest('#inicio')) {
+      localBotao = 'hero';
+    } else if (link.closest('#reservar')) {
+      localBotao = 'cta_final';
+    }
+    link.addEventListener('click', function(){
+      gtagSafe('event', 'clique_checkout', { local_botao: localBotao });
+    });
+  });
+})();
+</script>
 </body>
 </html>
